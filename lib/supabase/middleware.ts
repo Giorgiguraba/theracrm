@@ -1,6 +1,8 @@
-import { createServerClient } from "@supabase/ssr";
+import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseUrl, getSupabasePublicKey, hasSupabaseEnv } from "@/lib/env";
+
+type CookieToSet = { name: string; value: string; options?: CookieOptions };
 
 /**
  * Runs in middleware.ts. Refreshes the auth session and returns the
@@ -21,7 +23,7 @@ export async function updateSession(request: NextRequest) {
     {
       cookies: {
         getAll: () => request.cookies.getAll(),
-        setAll: (cookiesToSet) => {
+        setAll: (cookiesToSet: CookieToSet[]) => {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );

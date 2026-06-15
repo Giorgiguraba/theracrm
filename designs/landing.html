@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TheraCRM — The CRM your therapy center actually uses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #6161ff;
+    --purple-dark: #5034ff;
+    --blue: #0073ea;
+    --orange: #ff7a00;
+    --orange-light: #fdab3d;
+    --green: #00c875;
+    --green-dark: #00a356;
+    --pink: #ff5ac4;
+    --red: #e44258;
+    --yellow: #ffcb00;
+    --text: #323338;
+    --text-soft: #676879;
+    --bg: #ffffff;
+    --bg-soft: #f6f7fb;
+    --border: #e6e9ef;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .container { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+
+  /* NAV */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1240px; margin: 0 auto; }
+  .logo { display: flex; align-items: center; gap: 8px; font-weight: 800; font-size: 22px; }
+  .logo-mark {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    display: grid; place-items: center; color: white; font-weight: 900; font-size: 18px;
+  }
+  .nav-links { display: flex; gap: 32px; align-items: center; }
+  .nav-links a { text-decoration: none; color: var(--text); font-weight: 500; font-size: 15px; }
+  .nav-links a:hover { color: var(--purple); }
+  .nav-actions { display: flex; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-block; padding: 12px 24px; border-radius: 8px;
+    font-weight: 600; font-size: 15px; text-decoration: none; cursor: pointer;
+    border: none; transition: transform .15s, box-shadow .15s;
+  }
+  .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 20px rgba(0,0,0,.08); }
+  .btn-primary { background: var(--text); color: white; }
+  .btn-primary:hover { background: #1d1d20; }
+  .btn-secondary { background: white; color: var(--text); border: 1px solid var(--border); }
+  .btn-cta { background: var(--purple); color: white; padding: 16px 32px; font-size: 16px; }
+  .btn-cta:hover { background: var(--purple-dark); }
+  @media (max-width: 768px) { .nav-links { display: none; } }
+
+  /* HERO */
+  .hero { padding: 80px 0 60px; text-align: center; position: relative; overflow: hidden; }
+  .hero-eyebrow {
+    display: inline-block; padding: 6px 14px; border-radius: 999px;
+    background: #f0eeff; color: var(--purple); font-weight: 600; font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .hero h1 {
+    font-size: clamp(36px, 6vw, 68px); line-height: 1.05; font-weight: 800;
+    letter-spacing: -0.02em; margin-bottom: 24px; max-width: 900px; margin-left: auto; margin-right: auto;
+  }
+  .hero h1 .accent {
+    background: linear-gradient(120deg, var(--purple), var(--pink) 70%, var(--orange));
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  .hero p.sub {
+    font-size: 19px; color: var(--text-soft); max-width: 640px; margin: 0 auto 36px;
+  }
+  .hero-cta { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 16px; }
+  .hero-note { color: var(--text-soft); font-size: 14px; }
+
+  /* DASHBOARD MOCK */
+  .dashboard-mock {
+    margin: 64px auto 0; max-width: 1100px;
+    background: white; border-radius: 16px;
+    box-shadow: 0 24px 64px rgba(20,30,80,.12), 0 4px 12px rgba(20,30,80,.04);
+    border: 1px solid var(--border); overflow: hidden;
+  }
+  .dash-bar { display: flex; align-items: center; gap: 8px; padding: 12px 16px; background: #f6f7fb; border-bottom: 1px solid var(--border); }
+  .dash-dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dash-body { padding: 24px; }
+  .dash-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .dash-tab { padding: 6px 14px; border-radius: 6px; font-size: 13px; font-weight: 600; }
+  .tab-active { background: var(--purple); color: white; }
+  .tab-inactive { background: #f6f7fb; color: var(--text-soft); }
+  .kanban { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  @media (max-width: 768px) { .kanban { grid-template-columns: 1fr 1fr; } }
+  .kanban-col { background: #f6f7fb; border-radius: 10px; padding: 12px; }
+  .kanban-header { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+  .stage-pill { width: 12px; height: 12px; border-radius: 4px; }
+  .card-mini {
+    background: white; border-radius: 8px; padding: 10px 12px; margin-bottom: 8px;
+    border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,.03);
+    font-size: 13px;
+  }
+  .card-mini .name { font-weight: 600; margin-bottom: 4px; }
+  .card-mini .meta { color: var(--text-soft); font-size: 11px; }
+  .pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 600; margin-top: 6px; }
+
+  /* TRUSTED BAR */
+  .trusted { padding: 40px 0; text-align: center; border-bottom: 1px solid var(--border); }
+  .trusted-label { color: var(--text-soft); font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 20px; }
+  .trusted-logos { display: flex; gap: 48px; justify-content: center; flex-wrap: wrap; opacity: .55; }
+  .trusted-logos div { font-weight: 700; font-size: 18px; color: var(--text-soft); }
+
+  /* SECTIONS */
+  section { padding: 100px 0; }
+  .section-head { text-align: center; max-width: 720px; margin: 0 auto 64px; }
+  .section-eyebrow { color: var(--purple); font-weight: 700; font-size: 13px; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; }
+  .section-head h2 { font-size: clamp(32px, 4vw, 48px); line-height: 1.1; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px; }
+  .section-head p { font-size: 18px; color: var(--text-soft); }
+
+  /* FEATURE GRID */
+  .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .features { grid-template-columns: 1fr; } }
+  .feature {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 32px; transition: transform .2s, box-shadow .2s, border-color .2s;
+  }
+  .feature:hover { transform: translateY(-4px); box-shadow: 0 16px 40px rgba(20,30,80,.08); border-color: transparent; }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 12px; display: grid; place-items: center;
+    color: white; font-size: 22px; font-weight: 700; margin-bottom: 20px;
+  }
+  .icon-purple { background: linear-gradient(135deg, #6161ff, #8a7eff); }
+  .icon-orange { background: linear-gradient(135deg, #ff7a00, #fdab3d); }
+  .icon-green { background: linear-gradient(135deg, #00c875, #00a356); }
+  .icon-pink { background: linear-gradient(135deg, #ff5ac4, #e44258); }
+  .icon-blue { background: linear-gradient(135deg, #0073ea, #6161ff); }
+  .icon-yellow { background: linear-gradient(135deg, #ffcb00, #ff7a00); }
+  .feature h3 { font-size: 20px; font-weight: 700; margin-bottom: 10px; }
+  .feature p { color: var(--text-soft); font-size: 15px; }
+
+  /* SPLIT */
+  .split-section { background: var(--bg-soft); }
+  .split { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  @media (max-width: 900px) { .split { grid-template-columns: 1fr; gap: 40px; } }
+  .split.reverse > div:first-child { order: 2; }
+  @media (max-width: 900px) { .split.reverse > div:first-child { order: 0; } }
+  .split-text h2 { font-size: clamp(28px, 3.5vw, 40px); font-weight: 800; line-height: 1.15; margin-bottom: 20px; letter-spacing: -0.02em; }
+  .split-text p { color: var(--text-soft); font-size: 17px; margin-bottom: 24px; }
+  .check-list { list-style: none; }
+  .check-list li { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; font-size: 16px; }
+  .check-list li::before {
+    content: "✓"; flex-shrink: 0;
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--green); color: white; display: grid; place-items: center;
+    font-size: 13px; font-weight: 700;
+  }
+
+  /* VISUAL MOCKS */
+  .mock-card {
+    background: white; border-radius: 16px; padding: 24px;
+    box-shadow: 0 16px 40px rgba(20,30,80,.08); border: 1px solid var(--border);
+  }
+  .mock-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 16px; background: #fafbff; border-radius: 10px; margin-bottom: 8px;
+  }
+  .mock-row-left { display: flex; align-items: center; gap: 12px; }
+  .avatar {
+    width: 32px; height: 32px; border-radius: 50%; color: white;
+    display: grid; place-items: center; font-weight: 700; font-size: 13px;
+  }
+  .mock-info .name { font-weight: 600; font-size: 14px; }
+  .mock-info .src { color: var(--text-soft); font-size: 12px; }
+  .stage-tag { padding: 4px 12px; border-radius: 6px; font-size: 12px; font-weight: 600; color: white; }
+
+  /* EMAIL MOCK */
+  .email-mock {
+    border-radius: 14px; overflow: hidden; box-shadow: 0 16px 40px rgba(20,30,80,.1);
+    border: 1px solid var(--border);
+  }
+  .email-head {
+    background: var(--purple); color: white; padding: 14px 20px;
+    display: flex; gap: 8px; align-items: center; font-size: 13px;
+  }
+  .email-body { background: white; padding: 24px; }
+  .email-body h4 { font-size: 18px; margin-bottom: 10px; }
+  .email-body p { color: var(--text-soft); font-size: 14px; margin-bottom: 8px; }
+  .email-btn {
+    display: inline-block; padding: 10px 18px; background: var(--purple); color: white;
+    border-radius: 6px; font-weight: 600; font-size: 13px; margin-top: 12px;
+  }
+
+  /* PRICING */
+  .pricing { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .pricing { grid-template-columns: 1fr; } }
+  .price-card {
+    background: white; border: 1px solid var(--border); border-radius: 16px;
+    padding: 36px 28px; position: relative;
+  }
+  .price-card.featured {
+    border: 2px solid var(--purple);
+    box-shadow: 0 24px 56px rgba(97,97,255,.18);
+    transform: scale(1.02);
+  }
+  .price-badge {
+    position: absolute; top: -12px; left: 50%; transform: translateX(-50%);
+    background: var(--purple); color: white; padding: 4px 14px; border-radius: 999px;
+    font-size: 12px; font-weight: 700;
+  }
+  .price-tier { font-weight: 700; font-size: 14px; color: var(--text-soft); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+  .price-amount { font-size: 48px; font-weight: 800; letter-spacing: -0.03em; }
+  .price-amount small { font-size: 16px; color: var(--text-soft); font-weight: 500; }
+  .price-desc { color: var(--text-soft); font-size: 14px; margin: 8px 0 20px; }
+  .price-features { list-style: none; margin: 24px 0; }
+  .price-features li { padding: 8px 0; font-size: 14px; display: flex; gap: 10px; align-items: flex-start; }
+  .price-features li::before { content: "✓"; color: var(--green); font-weight: 700; }
+  .price-btn { display: block; width: 100%; text-align: center; padding: 14px; border-radius: 8px; font-weight: 600; text-decoration: none; }
+  .price-btn-primary { background: var(--purple); color: white; }
+  .price-btn-secondary { background: var(--bg-soft); color: var(--text); }
+
+  /* TESTIMONIAL */
+  .testimonial-section {
+    background: linear-gradient(135deg, #1d1d20 0%, #2d2d40 100%);
+    color: white;
+  }
+  .testimonial-section h2 { color: white; }
+  .testimonial-section .section-eyebrow { color: var(--orange-light); }
+  .testimonial-section .section-head p { color: rgba(255,255,255,.7); }
+  .testimonials { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  @media (max-width: 900px) { .testimonials { grid-template-columns: 1fr; } }
+  .testimonial {
+    background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1);
+    border-radius: 16px; padding: 28px;
+  }
+  .stars { color: var(--yellow); font-size: 16px; margin-bottom: 12px; }
+  .testimonial p { font-size: 15px; line-height: 1.6; margin-bottom: 16px; color: rgba(255,255,255,.9); }
+  .testimonial-author { display: flex; align-items: center; gap: 12px; }
+  .testimonial-author .name { font-weight: 600; font-size: 14px; }
+  .testimonial-author .role { color: rgba(255,255,255,.6); font-size: 12px; }
+
+  /* FINAL CTA */
+  .final-cta {
+    text-align: center;
+    background: linear-gradient(120deg, var(--purple), var(--pink) 70%, var(--orange));
+    color: white; padding: 96px 24px; border-radius: 24px; margin: 80px auto;
+    max-width: 1100px;
+  }
+  .final-cta h2 { font-size: clamp(32px, 4.5vw, 52px); font-weight: 800; line-height: 1.1; margin-bottom: 16px; letter-spacing: -0.02em; }
+  .final-cta p { font-size: 18px; opacity: .9; margin-bottom: 32px; max-width: 540px; margin-left: auto; margin-right: auto; }
+  .final-cta .btn-white { background: white; color: var(--text); }
+
+  /* FOOTER */
+  footer { background: #fafbff; padding: 64px 0 32px; border-top: 1px solid var(--border); }
+  .footer-grid { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 48px; margin-bottom: 48px; }
+  @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
+  .footer-brand p { color: var(--text-soft); font-size: 14px; margin-top: 12px; max-width: 280px; }
+  .footer-col h5 { font-weight: 700; font-size: 14px; margin-bottom: 16px; }
+  .footer-col ul { list-style: none; }
+  .footer-col li { margin-bottom: 10px; }
+  .footer-col a { text-decoration: none; color: var(--text-soft); font-size: 14px; }
+  .footer-col a:hover { color: var(--purple); }
+  .footer-bottom { border-top: 1px solid var(--border); padding-top: 24px; text-align: center; color: var(--text-soft); font-size: 13px; }
+
+  /* color helpers */
+  .bg-purple { background: var(--purple); }
+  .bg-blue { background: var(--blue); }
+  .bg-orange { background: var(--orange); }
+  .bg-green { background: var(--green); }
+  .bg-pink { background: var(--pink); }
+  .bg-yellow { background: var(--yellow); }
+  .bg-red { background: var(--red); }
+  .text-purple { color: var(--purple); }
+
+  /* floating shapes background */
+  .hero::before, .hero::after {
+    content: ''; position: absolute; border-radius: 50%; filter: blur(80px); opacity: .35; z-index: -1;
+  }
+  .hero::before { width: 400px; height: 400px; background: var(--purple); top: -100px; left: -100px; }
+  .hero::after { width: 400px; height: 400px; background: var(--pink); top: 50px; right: -100px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="logo">
+      <div class="logo-mark">T</div>
+      TheraCRM
+    </div>
+    <div class="nav-links">
+      <a href="#features">Features</a>
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#testimonials">Customers</a>
+    </div>
+    <div class="nav-actions">
+      <a href="#" class="btn btn-secondary">Sign in</a>
+      <a href="#pricing" class="btn btn-primary">Get started</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container">
+    <div class="hero-eyebrow">Built for therapy &amp; education centers</div>
+    <h1>The CRM your therapy center <span class="accent">actually uses</span></h1>
+    <p class="sub">
+      Replace the paper notebook with a colorful, dead-simple platform that captures every lead,
+      sends the follow-up your team forgets, and shows you exactly where your ad spend goes.
+    </p>
+    <div class="hero-cta">
+      <a href="#pricing" class="btn btn-cta">Start free — no credit card</a>
+      <a href="#how" class="btn btn-secondary" style="padding: 16px 28px;">▶ See it in action</a>
+    </div>
+    <div class="hero-note">14-day trial · Setup in 30 minutes · Georgian &amp; English</div>
+
+    <!-- DASHBOARD MOCK -->
+    <div class="dashboard-mock">
+      <div class="dash-bar">
+        <div class="dash-dot" style="background:#ff5f57;"></div>
+        <div class="dash-dot" style="background:#febc2e;"></div>
+        <div class="dash-dot" style="background:#28c840;"></div>
+        <div style="margin-left: 16px; font-size: 12px; color: var(--text-soft);">theracrm.app/leads</div>
+      </div>
+      <div class="dash-body">
+        <div class="dash-tabs">
+          <div class="dash-tab tab-active">Leads pipeline</div>
+          <div class="dash-tab tab-inactive">Programs</div>
+          <div class="dash-tab tab-inactive">Dashboard</div>
+          <div class="dash-tab tab-inactive">Templates</div>
+        </div>
+        <div class="kanban">
+          <div class="kanban-col">
+            <div class="kanban-header"><span class="stage-pill bg-blue"></span> New · 6</div>
+            <div class="card-mini">
+              <div class="name">Nino Beridze</div>
+              <div class="meta">FB Ads · Art therapy</div>
+              <span class="pill" style="background:#dfe9ff; color:#0073ea;">today</span>
+            </div>
+            <div class="card-mini">
+              <div class="name">Luka Tsereteli</div>
+              <div class="meta">IG Ads · Internship</div>
+              <span class="pill" style="background:#dfe9ff; color:#0073ea;">today</span>
+            </div>
+            <div class="card-mini">
+              <div class="name">Ana Khurodze</div>
+              <div class="meta">Manual · CBT course</div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-header"><span class="stage-pill bg-orange"></span> Contacted · 4</div>
+            <div class="card-mini">
+              <div class="name">Mariam J.</div>
+              <div class="meta">FB Ads · Group therapy</div>
+              <span class="pill" style="background:#fff1de; color:#ff7a00;">called</span>
+            </div>
+            <div class="card-mini">
+              <div class="name">Giga Lomidze</div>
+              <div class="meta">IG Ads · Internship</div>
+              <span class="pill" style="background:#fff1de; color:#ff7a00;">called</span>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-header"><span class="stage-pill bg-yellow"></span> Thinking · 3</div>
+            <div class="card-mini" style="border-left: 3px solid var(--orange);">
+              <div class="name">Salome P.</div>
+              <div class="meta">IG Ads · Art therapy</div>
+              <span class="pill" style="background:#ffe2e6; color:#e44258;">⏰ Follow up due</span>
+            </div>
+            <div class="card-mini">
+              <div class="name">David O.</div>
+              <div class="meta">Referral · CBT</div>
+            </div>
+          </div>
+          <div class="kanban-col">
+            <div class="kanban-header"><span class="stage-pill bg-green"></span> Enrolled · 11</div>
+            <div class="card-mini">
+              <div class="name">Tamta K.</div>
+              <div class="meta">₾ 450 · Internship</div>
+              <span class="pill" style="background:#d9f6e8; color:#00a356;">paid</span>
+            </div>
+            <div class="card-mini">
+              <div class="name">Sopo M.</div>
+              <div class="meta">₾ 380 · Art therapy</div>
+              <span class="pill" style="background:#d9f6e8; color:#00a356;">paid</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUSTED -->
+<div class="trusted">
+  <div class="container">
+    <div class="trusted-label">Trusted by therapy centers across Georgia</div>
+    <div class="trusted-logos">
+      <div>● Mindspace</div>
+      <div>◆ PsyHub Tbilisi</div>
+      <div>▲ Aurora Therapy</div>
+      <div>★ OpenMind</div>
+      <div>✦ Wellbeing Center</div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Everything you need</div>
+      <h2>One place for every lead, every follow-up, every enrollment</h2>
+      <p>Built around the simple workflow your team already runs — just without the lost leads.</p>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <div class="feature-icon icon-purple">📥</div>
+        <h3>Auto-capture from Meta Ads</h3>
+        <p>Every lead from Facebook &amp; Instagram lands in your inbox the second it's submitted. No spreadsheets, no copy-paste.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon icon-orange">📋</div>
+        <h3>Drag-and-drop pipeline</h3>
+        <p>New → Contacted → Thinking → Enrolled. Move cards as people move through. Your operator sees changes live.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon icon-green">⏰</div>
+        <h3>Follow-ups that never slip</h3>
+        <p>If a lead sits in "Thinking" too long, TheraCRM nudges your operator <em>and</em> the lead. Zero forgotten people.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon icon-pink">✉️</div>
+        <h3>Automated emails</h3>
+        <p>Enrollment confirmations, reminders, follow-up nudges — sent in Georgian or English, from your domain.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon icon-blue">📊</div>
+        <h3>Real ad ROI dashboard</h3>
+        <p>See exactly how much your ₾300/month ad budget turned into enrolled students. Stop guessing.</p>
+      </div>
+      <div class="feature">
+        <div class="feature-icon icon-yellow">📱</div>
+        <h3>Works on the phone</h3>
+        <p>Your operator can update leads from the kanban while walking — full mobile experience, not a cramped desktop port.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPLIT 1 -->
+<section class="split-section">
+  <div class="container">
+    <div class="split">
+      <div class="split-text">
+        <div class="section-eyebrow">Lead inbox</div>
+        <h2>Every Facebook lead lands here — automatically</h2>
+        <p>Stop checking three different inboxes. The moment someone fills out your IG or FB form, they appear in TheraCRM with name, phone, program of interest, and source already filled in.</p>
+        <ul class="check-list">
+          <li>Auto-import from Meta Lead Ads</li>
+          <li>Add walk-ins and DM leads manually</li>
+          <li>No duplicates — automatic deduplication</li>
+          <li>Realtime sync across all team members</li>
+        </ul>
+      </div>
+      <div>
+        <div class="mock-card">
+          <div style="font-weight: 700; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <span>📥 New leads today</span>
+            <span style="background: var(--purple); color: white; padding: 3px 10px; border-radius: 999px; font-size: 12px;">6 new</span>
+          </div>
+          <div class="mock-row">
+            <div class="mock-row-left">
+              <div class="avatar bg-purple">NB</div>
+              <div class="mock-info"><div class="name">Nino Beridze</div><div class="src">📘 Facebook · 2 min ago</div></div>
+            </div>
+            <div class="stage-tag bg-blue">New</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-row-left">
+              <div class="avatar bg-pink">LT</div>
+              <div class="mock-info"><div class="name">Luka Tsereteli</div><div class="src">📷 Instagram · 8 min ago</div></div>
+            </div>
+            <div class="stage-tag bg-blue">New</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-row-left">
+              <div class="avatar bg-orange">AK</div>
+              <div class="mock-info"><div class="name">Ana Khurodze</div><div class="src">💬 Manual · 14 min ago</div></div>
+            </div>
+            <div class="stage-tag bg-blue">New</div>
+          </div>
+          <div class="mock-row">
+            <div class="mock-row-left">
+              <div class="avatar bg-green">MJ</div>
+              <div class="mock-info"><div class="name">Mariam J.</div><div class="src">📘 Facebook · 1 hr ago</div></div>
+            </div>
+            <div class="stage-tag bg-orange">Contacted</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPLIT 2 -->
+<section>
+  <div class="container">
+    <div class="split reverse">
+      <div class="split-text">
+        <div class="section-eyebrow">Follow-up engine</div>
+        <h2>Your "I'm thinking about it" leads never get forgotten again</h2>
+        <p>The #1 reason therapy centers lose enrollments isn't price — it's silence. When someone hesitates for two days, TheraCRM sends them a warm, on-brand email <em>and</em> reminds your operator to call.</p>
+        <ul class="check-list">
+          <li>Configurable follow-up timing (48h default)</li>
+          <li>Bilingual templates: Georgian + English</li>
+          <li>Snooze, mark done, or escalate to the owner</li>
+          <li>Every touchpoint logged in the lead's history</li>
+        </ul>
+      </div>
+      <div>
+        <div class="email-mock">
+          <div class="email-head">
+            <div style="width: 8px; height: 8px; border-radius: 50%; background: white;"></div>
+            <span>Auto-sent · 48h after stage change</span>
+          </div>
+          <div class="email-body">
+            <div style="color: var(--text-soft); font-size: 12px; margin-bottom: 8px;">From: hello@mindspace.ge</div>
+            <div style="color: var(--text-soft); font-size: 12px; margin-bottom: 16px;">To: salome.p@gmail.com</div>
+            <h4>Hi Salome — still thinking about Art Therapy? 🎨</h4>
+            <p>We saved your spot in the upcoming cohort starting <strong>June 24</strong>. There are 3 places left.</p>
+            <p>If you have questions, just reply to this email — we read every one.</p>
+            <span class="email-btn">Confirm my spot →</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how" class="split-section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">How it works</div>
+      <h2>From paper notebook to running CRM in 30 minutes</h2>
+      <p>No IT team needed. We onboard you in one session — your operator works leads the same day.</p>
+    </div>
+    <div class="features">
+      <div class="feature" style="text-align: center;">
+        <div class="feature-icon icon-purple" style="margin: 0 auto 20px;">1</div>
+        <h3>Connect your ads</h3>
+        <p>One-click link to your Facebook page. Future leads start flowing in automatically.</p>
+      </div>
+      <div class="feature" style="text-align: center;">
+        <div class="feature-icon icon-orange" style="margin: 0 auto 20px;">2</div>
+        <h3>Add your programs</h3>
+        <p>Therapy types, courses, internship cohorts — with prices and start dates.</p>
+      </div>
+      <div class="feature" style="text-align: center;">
+        <div class="feature-icon icon-green" style="margin: 0 auto 20px;">3</div>
+        <h3>Work the pipeline</h3>
+        <p>Drag cards, log calls, send templates. TheraCRM handles the follow-ups you'd otherwise forget.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Pricing</div>
+      <h2>Honest pricing for small teams</h2>
+      <p>No "per seat" trickery. No annual lock-in. Cancel anytime.</p>
+    </div>
+    <div class="pricing">
+      <div class="price-card">
+        <div class="price-tier">Starter</div>
+        <div class="price-amount">₾0<small>/mo</small></div>
+        <div class="price-desc">For trying it out with a real pipeline.</div>
+        <ul class="price-features">
+          <li>Up to 50 leads / month</li>
+          <li>2 users</li>
+          <li>Kanban + manual lead entry</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-secondary">Start free</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-badge">Most popular</div>
+        <div class="price-tier">Pro</div>
+        <div class="price-amount">₾89<small>/mo</small></div>
+        <div class="price-desc">For active therapy centers running paid ads.</div>
+        <ul class="price-features">
+          <li>Unlimited leads</li>
+          <li>Up to 5 users</li>
+          <li>Meta Ads auto-import</li>
+          <li>Automated follow-up + email templates</li>
+          <li>Ad ROI dashboard</li>
+          <li>Priority chat support</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-primary">Start 14-day trial</a>
+      </div>
+      <div class="price-card">
+        <div class="price-tier">Center</div>
+        <div class="price-amount">₾199<small>/mo</small></div>
+        <div class="price-desc">For multi-team centers and corporate B2B.</div>
+        <ul class="price-features">
+          <li>Everything in Pro</li>
+          <li>Unlimited users</li>
+          <li>Corporate/B2B module</li>
+          <li>Custom integrations</li>
+          <li>Dedicated onboarding</li>
+        </ul>
+        <a href="#" class="price-btn price-btn-secondary">Talk to sales</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section id="testimonials" class="testimonial-section">
+  <div class="container">
+    <div class="section-head">
+      <div class="section-eyebrow">Loved by therapy teams</div>
+      <h2>"We finally stopped losing leads."</h2>
+      <p>Real centers, real follow-ups that actually happen.</p>
+    </div>
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"We were writing leads in a paper notebook. Last month we enrolled 9 students who would have been forgotten — that paid for the whole year."</p>
+        <div class="testimonial-author">
+          <div class="avatar bg-purple">NK</div>
+          <div>
+            <div class="name">Nino K.</div>
+            <div class="role">Owner, Mindspace Tbilisi</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"My operator works from her phone between sessions now. Drag a card, send a template, done. Zero training needed."</p>
+        <div class="testimonial-author">
+          <div class="avatar bg-orange">GL</div>
+          <div>
+            <div class="name">Giorgi L.</div>
+            <div class="role">Director, Aurora Therapy</div>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="stars">★★★★★</div>
+        <p>"The ad ROI view is brutally honest. We cut spend on the campaigns that weren't converting and doubled what worked."</p>
+        <div class="testimonial-author">
+          <div class="avatar bg-green">MT</div>
+          <div>
+            <div class="name">Mariam T.</div>
+            <div class="role">Marketing lead, OpenMind</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FINAL CTA -->
+<div class="container">
+  <div class="final-cta">
+    <h2>Stop losing the leads you paid for.</h2>
+    <p>Start your 14-day trial today. Setup in 30 minutes. Cancel anytime.</p>
+    <a href="#" class="btn btn-white" style="padding: 18px 36px; font-size: 17px;">Get started free →</a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <div class="logo"><div class="logo-mark">T</div> TheraCRM</div>
+        <p>The CRM built for psychology centers, therapy teams, and education programs in Georgia.</p>
+      </div>
+      <div class="footer-col">
+        <h5>Product</h5>
+        <ul>
+          <li><a href="#features">Features</a></li>
+          <li><a href="#pricing">Pricing</a></li>
+          <li><a href="#">Changelog</a></li>
+          <li><a href="#">Roadmap</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Company</h5>
+        <ul>
+          <li><a href="#">About</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">Privacy</a></li>
+          <li><a href="#">Terms</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h5>Resources</h5>
+        <ul>
+          <li><a href="#">Help center</a></li>
+          <li><a href="#">Onboarding guide</a></li>
+          <li><a href="#">API docs</a></li>
+          <li><a href="#">Status</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">© 2026 TheraCRM · Built in Tbilisi</div>
+  </div>
+</footer>
+
+</body>
+</html>

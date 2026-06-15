@@ -140,9 +140,9 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
                     </div>
                     {a.type === "stage_change" && a.payload && (
                       <div className="text-sm flex items-center gap-1.5">
-                        <StageChip stage={(a.payload as { from: schema.Lead["stage"] }).from as never} />
+                        <StageChip stage={(a.payload as { from: schema.Stage }).from} />
                         <span className="text-[var(--text-faint)]">→</span>
-                        <StageChip stage={(a.payload as { to: schema.Lead["stage"] }).to as never} />
+                        <StageChip stage={(a.payload as { to: schema.Stage }).to} />
                       </div>
                     )}
                     {a.type === "note" && a.payload && (

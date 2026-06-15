@@ -67,7 +67,7 @@ function Section({
 }: {
   title: string;
   empty: string;
-  reminders: typeof schema.reminders.$inferSelect[];
+  reminders: (typeof schema.reminders.$inferSelect)[];
   leadById: (id: string) => typeof schema.leads.$inferSelect | undefined;
   tint: string;
 }) {

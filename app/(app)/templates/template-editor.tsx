@@ -12,7 +12,12 @@ type Template = {
   locale: string; isActive: boolean;
 };
 
-const STARTERS: Omit<Template, "id">[] = [
+type StarterTemplate = {
+  key: string; subject: string; bodyHtml: string;
+  locale: "ka" | "en"; isActive: boolean;
+};
+
+const STARTERS: StarterTemplate[] = [
   {
     key: "enrollment_confirmation",
     subject: "Welcome to {program} 🎉",

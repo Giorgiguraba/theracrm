@@ -3,6 +3,10 @@ import { Sidebar } from "@/components/shell/sidebar";
 import { Topbar } from "@/components/shell/topbar";
 import { initials } from "@/lib/utils";
 
+// Every tenant page depends on the current user's session & DB queries —
+// never prerender, always render per request.
+export const dynamic = "force-dynamic";
+
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user, tenant, role, isPastDue } = await requireUser();
   const name = (user.user_metadata?.full_name as string) ?? user.email ?? "User";

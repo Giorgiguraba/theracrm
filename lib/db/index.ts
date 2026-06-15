@@ -2,13 +2,33 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 import * as schema from "./schema";
 
-const url = process.env.DATABASE_URL;
-if (!url) throw new Error("DATABASE_URL is not set");
+const globalForPg = globalThis as unknown as {
+  pg?: ReturnType<typeof postgres>;
+  drz?: ReturnType<typeof drizzle<typeof schema>>;
+};
 
-// Reuse the connection across hot reloads in dev
-const globalForPg = globalThis as unknown as { pg?: ReturnType<typeof postgres> };
-const client = globalForPg.pg ?? postgres(url, { max: 10, prepare: false, ssl: "require" });
-if (process.env.NODE_ENV !== "production") globalForPg.pg = client;
+function init() {
+  if (globalForPg.drz) return globalForPg.drz;
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error("DATABASE_URL is not set");
+  const client = globalForPg.pg ?? postgres(url, { max: 10, prepare: false, ssl: "require" });
+  if (process.env.NODE_ENV !== "production") globalForPg.pg = client;
+  const drz = drizzle(client, { schema });
+  if (process.env.NODE_ENV !== "production") globalForPg.drz = drz;
+  return drz;
+}
 
-export const db = drizzle(client, { schema });
+// Lazy proxy — importing this module doesn't connect to the DB.
+// Connection happens the first time you actually access `db.select(...)` etc.
+// This keeps `next build`'s static-collect phase happy when env vars are missing.
+export const db = new Proxy(
+  {} as ReturnType<typeof drizzle<typeof schema>>,
+  {
+    get(_t, prop) {
+      const d = init() as unknown as Record<string | symbol, unknown>;
+      return d[prop];
+    },
+  },
+);
+
 export { schema };

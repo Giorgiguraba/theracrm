@@ -11,7 +11,15 @@ function init() {
   if (globalForPg.drz) return globalForPg.drz;
   const url = process.env.DATABASE_URL;
   if (!url) throw new Error("DATABASE_URL is not set");
-  const client = globalForPg.pg ?? postgres(url, { max: 10, prepare: false, ssl: "require" });
+  // max: 1 per serverless instance — recommended for Vercel + Supabase transaction pooler.
+  // The pooler handles concurrency, not the postgres-js client.
+  const client = globalForPg.pg ?? postgres(url, {
+    max: 1,
+    prepare: false,
+    ssl: "require",
+    idle_timeout: 20,
+    max_lifetime: 60 * 30,
+  });
   if (process.env.NODE_ENV !== "production") globalForPg.pg = client;
   const drz = drizzle(client, { schema });
   if (process.env.NODE_ENV !== "production") globalForPg.drz = drz;

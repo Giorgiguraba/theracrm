@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { getBrowserSupabase } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,14 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 
 export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen grid place-items-center p-6 text-sm text-[var(--text-soft)]">Loading…</div>}>
+      <SignInInner />
+    </Suspense>
+  );
+}
+
+function SignInInner() {
   const router = useRouter();
   const params = useSearchParams();
   const next = params.get("next") ?? "/leads";

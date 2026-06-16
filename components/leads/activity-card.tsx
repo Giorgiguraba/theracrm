@@ -1,3 +1,4 @@
+"use client";
 import { Bell, ArrowUpRight, Mail, Phone, Video, Check, Clock } from "lucide-react";
 import { initials } from "@/lib/utils";
 import Link from "next/link";
